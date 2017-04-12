@@ -22,8 +22,14 @@ module ActiveRecord
         def exec_insert(sql, name, binds, pk = nil, _sequence_name = nil)
           if id_insert_table_name = exec_insert_requires_identity?(sql, pk, binds)
             with_identity_insert_enabled(id_insert_table_name) { exec_query(sql, name, binds) }
+          elsif @connection_options[:mode] == :sequel
+            exec_insert_sequel(sql, name, binds, pk, _sequence_name)
           else
-            if @connection_options[:mode] == :sequel
+            exec_query(sql, name, binds)
+          end
+        end
+
+        def exec_insert_sequel(sql, name, binds, pk = nil, _sequence_name = nil)
               if binds.blank? && sql.include?(IDENT_SELECT_QUERY)
                 raw_insert = sql.gsub(IDENT_SELECT_QUERY, '')
                 @connection.run(raw_insert)
@@ -35,10 +41,6 @@ module ActiveRecord
               else
                 exec_query(sql, name, binds)
               end
-            else
-              exec_query(sql, name, binds)
-            end
-          end
         end
 
         def exec_delete(sql, name, binds)

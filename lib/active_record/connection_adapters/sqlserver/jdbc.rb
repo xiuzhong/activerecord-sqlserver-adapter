@@ -17,7 +17,7 @@ module ActiveRecord
         NativeException = java.lang.Exception
              
         # Default database error classes
-        DATABASE_ERROR_CLASSES = [NativeException].freeze
+        DATABASE_ERROR_CLASSES = [NativeException]
         if JRUBY_VERSION < '9.2'
          # On JRuby <9.2, still include ::NativeException, as it is still needed in some cases
          DATABASE_ERROR_CLASSES << ::NativeException
